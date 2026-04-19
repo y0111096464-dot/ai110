@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nusur Tech Pro | الإدارة الشاملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --main-blue: #007bff;
+            --dark-bg: #0b1120;
+            --card-bg: #1e293b;
+            --text-white: #f8fafc;
+            --text-gray: #94a3b8;
+            --admin-red: #ef4444;
+            --admin-green: #22c55e;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-white);
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding-bottom: 80px; /* مساحة للقائمة السفلية في الموبايل */
+        }
+
+        /* --- زر المدير المطور (يعمل على الأندرويد) --- */
+        #admin-lock-btn {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+            background: var(--admin-red);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            z-index: 10001;
+            font-size: 22px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- لوحة التحكم (المنبثقة) --- */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10002;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-box {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid var(--main-blue);
+        }
+
+        /* --- الهيدر (التصميم القديم) --- */
+        header {
+            background: #111827;
+            border-bottom: 1px solid #1f2937;
+            padding: 15px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--main-blue); text-decoration: none; }
+        
+        /* --- القوائم --- */
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; }
+        nav ul li a { color: var(--text-white); text-decoration: none; font-weight: 600; cursor: pointer; }
+        nav ul li a.active { color: var(--main-blue); border-bottom: 2px solid var(--main-blue); }
+
+        /* --- التخطيط (الكمبيوتر) --- */
+        .container { display: grid; grid-template-columns: 1fr 320px; gap: 30px; padding: 30px 8%; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.4s; }
+
+        /* --- البطاقات --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .card img { width: 100%; height: 170px; object-fit: cover; }
+        .card-body { padding: 20px; }
+        .category-badge { background: var(--main-blue); color: white; font-size: 11px; padding: 2px 12px; border-radius: 4px; margin-bottom: 10px; display: inline-block; }
+        .download-link {
+            display: block; text-align: center; background: #2563eb; color: white;
+            padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold;
+        }
+
+        /* --- التعديل المباشر --- */
+        .admin-active .editable { outline: 1.5px dashed var(--main-blue); background: rgba(0,123,255,0.1); }
+        .delete-btn {
+            position: absolute; top: 10px; left: 10px; background: var(--admin-red);
+            color: white; border: none; border-radius: 50%; width: 35px; height: 35px;
+            display: none; z-index: 10; cursor: pointer;
+        }
+
+        /* --- الموبايل --- */
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; padding: 15px; }
+            aside { display: none; }
+            header { padding: 15px 5%; }
+            nav {
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: #111827; border-top: 1px solid #1f2937;
+            }
+            nav ul { justify-content: space-around; padding: 12px 0; gap: 0; }
+            nav ul li a { font-size: 12px; display: flex; flex-direction: column; align-items: center; }
+        }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 12px; background: #0f172a;
+            border: 1px solid #334155; color: white; border-radius: 8px; font-family: inherit;
+        }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body id="page-body">
+
+    <button id="admin-lock-btn">
+        <i class="fas fa-lock" id="lock-icon"></i>
+    </button>
+
+    <div class="admin-modal" id="admin-modal">
+        <div class="modal-box">
+            <h3 style="color:var(--main-blue); margin-top:0">لوحة الإدارة</h3>
+            <input type="text" id="post-title" placeholder="اسم التطبيق">
+            <input type="text" id="post-img" placeholder="رابط الصورة">
+            <textarea id="post-desc" placeholder="وصف المختصر"></textarea>
+            <input type="text" id="post-url" placeholder="رابط التحميل">
+            <select id="post-cat">
+                <option value="apps">قسم التطبيقات</option>
+                <option value="games">قسم الألعاب</option>
+                <option value="courses">قسم الكورسات</option>
+            </select>
+            <button class="btn-action" style="background:var(--admin-green); color:white" onclick="handleCreate()">نشر الآن</button>
+            <button class="btn-action" style="background:var(--main-blue); color:white" onclick="handleSaveTexts()">حفظ نصوص الواجهة</button>
+            <button class="btn-action" style="background:none; color:var(--text-gray)" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <header>
+        <a href="#" class="logo editable" id="txt-logo">NUSUR TECH</a>
+        <nav>
+            <ul>
+                <li><a onclick="showPage('home')" id="nav-home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                <li><a onclick="showPage('apps')" id="nav-apps"><i class="fas fa-mobile-alt"></i> تطبيقات</a></li>
+                <li><a onclick="showPage('games')" id="nav-games"><i class="fas fa-gamepad"></i> ألعاب</a></li>
+                <li><a onclick="showPage('courses')" id="nav-courses"><i class="fas fa-graduation-cap"></i> كورسات</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main>
+            <div id="home" class="page-content active">
+                <div style="background: linear-gradient(135deg, var(--card-bg), #0f172a); padding: 30px; border-radius: 20px; margin-bottom: 30px; border: 1px solid var(--main-blue);">
+                    <h1 class="editable" id="txt-hero-title">أهلاً بك في مكتبة البرمجيات</h1>
+                    <p class="editable" id="txt-hero-desc" style="color:var(--text-gray)">نحن نوفر لك أفضل الأدوات التقنية المعدلة بأحدث الإصدارات.</p>
+                </div>
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-bolt" style="color:gold"></i> أحدث المضاف</h2>
+                <div class="grid" id="master-grid"></div>
+            </div>
+
+            <div id="apps" class="page-content"><h2>قسم التطبيقات</h2><div class="grid" id="grid-apps"></div></div>
+            <div id="games" class="page-content"><h2>قسم الألعاب</h2><div class="grid" id="grid-games"></div></div>
+            <div id="courses" class="page-content"><h2>قسم الكورسات</h2><div class="grid" id="grid-courses"></div></div>
+        </main>
+
+        <aside>
+            <div style="background:var(--card-bg); padding:20px; border-radius:15px; border:1px solid #334155;">
+                <h4 class="editable" id="txt-side-title">إعلانات وتنبيهات</h4>
+                <p class="editable" id="txt-side-desc" style="font-size:13px; color:var(--text-gray)">تابع قناتنا على التيليجرام للحصول على تحديثات يومية فورية.</p>
+                <a href="#" style="color:var(--main-blue); font-weight:bold; text-decoration:none; font-size:14px;">انضم الآن <i class="fas fa-external-link-alt"></i></a>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let isAdmin = false;
+        let posts = JSON.parse(localStorage.getItem('myPosts_v5')) || [];
+
+        // تشغيل النظام
+        window.onload = function() {
+            render();
+            loadInterface();
+            
+            // مستمع الحدث للزر الأحمر (أضمن للأندرويد)
+            document.getElementById('admin-lock-btn').addEventListener('click', function() {
+                if(!isAdmin) {
+                    let p = prompt("كلمة السر:");
+                    if(p === "2006") {
+                        activateAdmin();
+                    } else { alert("خطأ!"); }
+                } else {
+                    document.getElementById('admin-modal').style.display = 'flex';
+                }
+            });
+        };
+
+        function activateAdmin() {
+            isAdmin = true;
+            document.body.classList.add('admin-active');
+            document.getElementById('lock-icon').className = "fas fa-plus";
+            document.getElementById('admin-lock-btn').style.background = "var(--admin-green)";
+            document.querySelectorAll('.editable').forEach(e => e.contentEditable = true);
+            document.getElementById('admin-modal').style.display = 'flex';
+            render();
+        }
+
+        function closeModal() { document.getElementById('admin-modal').style.display = 'none'; }
+
+        function handleCreate() {
+            const title = document.getElementById('post-title').value;
+            const img = document.getElementById('post-img').value || 'https://via.placeholder.com/300x170/1e293b/f8fafc?text=NusurTech';
+            const desc = document.getElementById('post-desc').value;
+            const url = document.getElementById('post-url').value;
+            const cat = document.getElementById('post-cat').value;
+
+            if(!title || !url) return alert("الرجاء إدخال الاسم والرابط");
+
+            posts.unshift({ id: Date.now(), title, img, desc, url, cat });
+            localStorage.setItem('myPosts_v5', JSON.stringify(posts));
+            render();
+            closeModal();
+            alert("تم النشر!");
+        }
+
+        function render() {
+            const grids = ['master-grid', 'grid-apps', 'grid-games', 'grid-courses'];
+            grids.forEach(g => document.getElementById(g).innerHTML = "");
+
+            posts.forEach(p => {
+                const html = `
+                    <div class="card">
+                        <button class="delete-btn" onclick="handleDelete(${p.id})" style="display:${isAdmin?'block':'none'}">×</button>
+                        <img src="${p.img}">
+                        <div class="card-body">
+                            <span class="category-badge">${p.cat}</span>
+                            <h3 class="card-title">${p.title}</h3>
+                            <p class="card-desc">${p.desc}</p>
+                            <a href="${p.url}" class="download-link">تحميل الآن</a>
+                        </div>
+                    </div>`;
+                document.getElementById('master-grid').innerHTML += html;
+                if(document.getElementById('grid-'+p.cat)) {
+                    document.getElementById('grid-'+p.cat).innerHTML += html;
+                }
+            });
+        }
+
+        window.handleDelete = function(id) {
+            if(confirm("حذف المنشور؟")) {
+                posts = posts.filter(p => p.id !== id);
+                localStorage.setItem('myPosts_v5', JSON.stringify(posts));
+                render();
+            }
+        }
+
+        function showPage(pId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(pId).classList.add('active');
+            document.getElementById('nav-' + pId).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function handleSaveTexts() {
+            const ui = {
+                logo: document.getElementById('txt-logo').innerText,
+                ht: document.getElementById('txt-hero-title').innerText,
+                hd: document.getElementById('txt-hero-desc').innerText,
+                st: document.getElementById('txt-side-title').innerText,
+                sd: document.getElementById('txt-side-desc').innerText
+            };
+            localStorage.setItem('interface_v5', JSON.stringify(ui));
+            alert("تم حفظ نصوص الواجهة!");
+        }
+
+        function loadInterface() {
+            const saved = JSON.parse(localStorage.getItem('interface_v5'));
+            if(saved) {
+                document.getElementById('txt-logo').innerText = saved.logo;
+                document.getElementById('txt-hero-title').innerText = saved.ht;
+                document.getElementById('txt-hero-desc').innerText = saved.hd;
+                document.getElementById('txt-side-title').innerText = saved.st;
+                document.getElementById('txt-side-desc').innerText = saved.sd;
+            }
+        }
+    </script>
+</body>
+</html>
