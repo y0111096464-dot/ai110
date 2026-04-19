@@ -95,17 +95,6 @@
             line-height: 1.6;
             max-height: 500px;
         }
-        
-        /* Settings Modal */
-        #settings-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -128,61 +117,52 @@
                 <button onclick="showTab('audio-gen')" class="nav-tab px-3 py-1 text-sm font-semibold hover:text-indigo-400 transition-all">الصوت</button>
             </nav>
 
-            <button onclick="toggleSettings()" class="text-slate-400 hover:text-white transition-colors">
-                <i class="fas fa-cog text-xl"></i>
-            </button>
+            <div class="w-10 h-10"></div> <!-- Spacer -->
         </div>
     </header>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal">
-        <div class="glass-panel p-8 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">إعدادات الاتصال</h3>
-            <p class="text-sm text-slate-400 mb-4">إذا كان الموقع لا يعمل، أدخل مفتاح Gemini الخاص بك هنا. سيتم حفظه في متصفحك فقط.</p>
-            <input type="password" id="custom-api-key" placeholder="أدخل مفتاح API هنا..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 mb-4 outline-none focus:ring-2 focus:ring-indigo-500">
-            <div class="flex gap-3">
-                <button onclick="saveApiKey()" class="flex-1 bg-indigo-600 p-3 rounded-lg font-bold">حفظ</button>
-                <button onclick="toggleSettings()" class="flex-1 bg-slate-700 p-3 rounded-lg font-bold">إغلاق</button>
-            </div>
-        </div>
-    </div>
 
     <main class="flex-1 container mx-auto px-4 pt-4 pb-20">
         
         <!-- Welcome Section -->
         <section class="text-center mb-10 mt-4">
             <h2 class="text-3xl md:text-5xl font-black mb-4">قوة <span class="ai-gradient-text">الذكاء المطلق</span></h2>
-            <div id="connection-status" class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-slate-800 text-xs border border-slate-700 text-slate-400 mb-4">
+            
+            <div id="connection-status" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold border border-slate-700 text-slate-400 mb-4 transition-all uppercase tracking-wider">
                 <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
-                جاري التحقق من الاتصال...
+                جاري التحقق من المفتاح...
             </div>
-            <p class="text-slate-400 text-sm md:text-base">توليد نصوص، برمجة، تحليل صور، ورسم احترافي في منصة واحدة.</p>
+            
+            <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+                مرحباً بك في Nexus Pro. تم إعداد النظام ليعمل بمفتاحك الخاص مباشرة.
+            </p>
         </section>
 
-        <!-- Tab: Text Generation (Default) -->
+        <!-- Tab: Text -->
         <div id="text-gen" class="tab-content active">
             <div class="glass-panel p-6 max-w-4xl mx-auto shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
-                    <i class="fas fa-microchip text-indigo-500 text-2xl"></i>
-                    <h3 class="text-xl font-bold">النظام الذكي الشامل</h3>
+                    <i class="fas fa-magic text-indigo-500 text-2xl"></i>
+                    <h3 class="text-xl font-bold">المساعد النصي الذكي</h3>
                 </div>
-                <textarea id="text-input" placeholder="اطلب أي شيء: مقالات، أبحاث، حلول معقدة..." class="w-full h-40 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" dir="rtl"></textarea>
-                <div class="flex items-center gap-4 mb-6">
+                <textarea id="text-input" placeholder="اكتب سؤالك أو اطلب كتابة مقال، حل مسألة، أو تلخيص نص..." class="w-full h-44 bg-slate-900/50 border border-slate-700 rounded-xl p-5 mb-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" dir="rtl"></textarea>
+                
+                <div class="flex items-center gap-4 mb-6 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="search-grounding" class="sr-only peer">
                         <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                        <span class="mr-3 text-sm font-medium">بحث Google المباشر</span>
+                        <span class="mr-3 text-xs font-bold text-slate-300">تفعيل البحث في Google (للحصول على معلومات حية)</span>
                     </label>
                 </div>
-                <button onclick="generateText()" id="text-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold transition-all glow-btn flex items-center justify-center gap-3">
-                    <span>تحليل وتوليد</span>
-                    <i class="fas fa-bolt"></i>
+
+                <button onclick="generateText()" id="text-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold transition-all glow-btn flex items-center justify-center gap-3 text-lg">
+                    <span>توليد الاستجابة</span>
+                    <i class="fas fa-paper-plane"></i>
                 </button>
 
-                <div id="text-result-container" class="mt-8 hidden">
+                <div id="text-result-container" class="mt-8 hidden animate-fadeIn">
                     <div class="p-6 bg-slate-900/80 rounded-2xl border border-slate-700 relative shadow-inner">
-                        <div id="text-result" class="prose prose-invert max-w-none text-right leading-relaxed text-slate-200 whitespace-pre-wrap"></div>
-                        <div id="sources" class="mt-4 pt-4 border-t border-slate-800 text-xs text-indigo-400"></div>
+                        <div id="text-result" class="prose prose-invert max-w-none text-right leading-relaxed text-slate-200 whitespace-pre-wrap text-sm md:text-base"></div>
+                        <div id="sources" class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-indigo-400 italic"></div>
                     </div>
                 </div>
             </div>
@@ -193,23 +173,23 @@
             <div class="glass-panel p-6 max-w-5xl mx-auto shadow-2xl">
                 <div class="flex items-center gap-3 mb-6">
                     <i class="fas fa-terminal text-cyan-400 text-2xl"></i>
-                    <h3 class="text-xl font-bold">Forge IDE | بناء الأنظمة</h3>
+                    <h3 class="text-xl font-bold">Forge IDE | المبرمج الخارق</h3>
                 </div>
-                <textarea id="code-prompt" placeholder="صف البرنامج الذي تريده..." class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-4 focus:ring-2 focus:ring-cyan-500 outline-none transition-all" dir="rtl"></textarea>
+                <textarea id="code-prompt" placeholder="صف التطبيق الذي تريده (مثلاً: صفحة هبوط لمطعم، أو آلة حاسبة متطورة)" class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-4 focus:ring-2 focus:ring-cyan-500 outline-none transition-all" dir="rtl"></textarea>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <button onclick="generateSoftware('html')" id="html-btn" class="py-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl font-bold transition-all flex items-center justify-center gap-3">
-                        <i class="fab fa-chrome text-orange-400 text-xl"></i> منصة ويب كاملة
+                    <button onclick="generateSoftware('html')" id="html-btn" class="py-4 bg-slate-800 hover:bg-cyan-900/30 border border-slate-600 rounded-xl font-bold transition-all flex items-center justify-center gap-3">
+                        <i class="fab fa-chrome text-orange-400 text-xl"></i> إنشاء تطبيق ويب (HTML/JS)
                     </button>
-                    <button onclick="generateSoftware('python')" id="py-btn" class="py-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl font-bold transition-all flex items-center justify-center gap-3">
-                        <i class="fab fa-python text-blue-400 text-xl"></i> سكربت بايثون
+                    <button onclick="generateSoftware('python')" id="py-btn" class="py-4 bg-slate-800 hover:bg-blue-900/30 border border-slate-600 rounded-xl font-bold transition-all flex items-center justify-center gap-3">
+                        <i class="fab fa-python text-blue-400 text-xl"></i> إنشاء كود (Python)
                     </button>
                 </div>
 
                 <div id="code-result-container" class="mt-8 hidden">
                     <div class="flex justify-between items-center mb-4 bg-slate-800/80 p-3 rounded-lg border border-slate-700">
-                        <span class="text-cyan-400 font-mono text-xs uppercase">Source Code</span>
-                        <button onclick="copyText('code-output')" class="px-4 py-1.5 bg-indigo-600 rounded-md text-xs font-bold">نسخ</button>
+                        <span class="text-cyan-400 font-mono text-[10px] uppercase">Source Code Available</span>
+                        <button onclick="copyText('code-output')" class="px-4 py-1.5 bg-indigo-600 rounded-md text-xs font-bold hover:bg-indigo-500">نسخ الكود</button>
                     </div>
                     <pre id="code-output" class="code-editor"></pre>
                 </div>
@@ -218,31 +198,28 @@
 
         <!-- Tab: Vision -->
         <div id="vision" class="tab-content">
-            <div class="glass-panel p-6 max-w-4xl mx-auto">
-                <div class="flex items-center gap-3 mb-6">
-                    <i class="fas fa-eye text-rose-500 text-2xl"></i>
-                    <h3 class="text-xl font-bold">الرؤية الحاسوبية</h3>
-                </div>
-                <div class="border-2 border-dashed border-slate-700 rounded-2xl p-8 text-center hover:border-rose-500 transition-all mb-6 cursor-pointer bg-slate-800/20" onclick="document.getElementById('vision-file').click()">
-                    <i class="fas fa-file-image text-3xl mb-3 text-slate-500"></i>
-                    <p class="text-sm">ارفع صورة للتحليل</p>
+             <div class="glass-panel p-6 max-w-4xl mx-auto">
+                <div class="flex items-center gap-3 mb-6"><i class="fas fa-eye text-rose-500 text-2xl"></i><h3 class="text-xl font-bold">تحليل الصور</h3></div>
+                <div class="border-2 border-dashed border-slate-700 rounded-2xl p-8 text-center mb-6 bg-slate-800/20 cursor-pointer hover:bg-slate-800/40 transition-all" onclick="document.getElementById('vision-file').click()">
+                    <i class="fas fa-cloud-upload-alt text-3xl mb-3 text-slate-500"></i>
+                    <p class="text-sm">انقر لرفع صورة وتحليلها</p>
                     <input type="file" id="vision-file" hidden accept="image/*" onchange="handleImageUpload(event)">
                 </div>
-                <div id="vision-preview-container" class="hidden mb-6 text-center"><img id="vision-preview" class="rounded-xl max-h-60 mx-auto border border-slate-700" src=""></div>
-                <input type="text" id="vision-prompt" placeholder="ماذا تريد أن تعرف عن الصورة؟" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-4 outline-none focus:ring-2 focus:ring-rose-500">
-                <button onclick="analyzeImage()" id="vision-btn" class="w-full py-4 bg-rose-600 hover:bg-rose-700 rounded-xl font-bold transition-all glow-btn">تحليل فوري</button>
-                <div id="vision-result-container" class="mt-8 hidden p-6 bg-slate-900/80 rounded-2xl border border-slate-700" id="vision-result-text"></div>
+                <div id="vision-preview-container" class="hidden mb-6"><img id="vision-preview" class="rounded-xl max-h-60 mx-auto border border-slate-700 shadow-lg" src=""></div>
+                <input type="text" id="vision-prompt" placeholder="ماذا تريد أن تعرف عن هذه الصورة؟" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-4 outline-none focus:ring-2 focus:ring-rose-500">
+                <button onclick="analyzeImage()" id="vision-btn" class="w-full py-4 bg-rose-600 hover:bg-rose-700 rounded-xl font-bold transition-all glow-btn">بدء التحليل</button>
+                <div id="vision-result-container" class="mt-8 hidden p-6 bg-slate-900/80 rounded-2xl border border-slate-700 text-sm leading-relaxed" id="vision-result-text"></div>
             </div>
         </div>
 
-        <!-- Tab: Art -->
+        <!-- Tab: Image Gen -->
         <div id="image-gen" class="tab-content">
-             <div class="glass-panel p-6 max-w-4xl mx-auto">
-                <div class="flex items-center gap-3 mb-6"><i class="fas fa-paint-brush text-amber-500 text-2xl"></i><h3 class="text-xl font-bold">توليد الصور</h3></div>
-                <textarea id="image-prompt" placeholder="صف ما تريد رسمه..." class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-6 outline-none focus:ring-2 focus:ring-amber-500"></textarea>
-                <button onclick="generateArt()" id="art-btn" class="w-full py-4 bg-amber-600 hover:bg-amber-700 rounded-xl font-bold glow-btn">رسم الصورة</button>
+            <div class="glass-panel p-6 max-w-4xl mx-auto">
+                <div class="flex items-center gap-3 mb-6"><i class="fas fa-palette text-amber-500 text-2xl"></i><h3 class="text-xl font-bold">توليد الصور الفنية</h3></div>
+                <textarea id="image-prompt" placeholder="صف المشهد بتفاصيل دقيقة (بالانجليزية يفضل)..." class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-6 outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                <button onclick="generateArt()" id="art-btn" class="w-full py-4 bg-amber-600 hover:bg-amber-700 rounded-xl font-bold glow-btn">رسم الصورة الآن</button>
                 <div id="art-result-container" class="mt-8 hidden text-center">
-                    <img id="art-result" class="rounded-2xl mx-auto shadow-2xl border-4 border-slate-800" src="">
+                    <img id="art-result" class="rounded-2xl mx-auto shadow-2xl border-4 border-slate-800 max-w-full" src="">
                 </div>
             </div>
         </div>
@@ -250,21 +227,26 @@
         <!-- Tab: Audio -->
         <div id="audio-gen" class="tab-content">
             <div class="glass-panel p-6 max-w-4xl mx-auto">
-                <div class="flex items-center gap-3 mb-6"><i class="fas fa-waveform-lines text-emerald-500 text-2xl"></i><h3 class="text-xl font-bold">تحويل النص لصوت</h3></div>
-                <textarea id="audio-text" placeholder="اكتب النص هنا..." class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-6 outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                <button onclick="generateAudio()" id="audio-btn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold glow-btn">توليد الصوت</button>
-                <div id="audio-result-container" class="mt-8 hidden flex justify-center"><audio id="audio-player" controls class="w-full max-w-md"></audio></div>
+                <div class="flex items-center gap-3 mb-6"><i class="fas fa-microphone-alt text-emerald-500 text-2xl"></i><h3 class="text-xl font-bold">تحويل النص إلى صوت</h3></div>
+                <textarea id="audio-text" placeholder="اكتب النص الذي تريد تحويله إلى صوت..." class="w-full h-32 bg-slate-900/50 border border-slate-700 rounded-xl p-4 mb-6 outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                <button onclick="generateAudio()" id="audio-btn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold glow-btn">توليد ملف الصوت</button>
+                <div id="audio-result-container" class="mt-8 hidden flex flex-col items-center gap-4">
+                    <audio id="audio-player" controls class="w-full max-w-md"></audio>
+                </div>
             </div>
         </div>
 
     </main>
 
     <script>
-        // System variables
-        let apiKey = ""; // Default empty for auto-injection
-        let currentCode = "";
+        /**
+         * السطر المطلوب تعديله هو السطر رقم 305 بالأسفل
+         * ضع مفتاحك بين علامتي التنصيص ""
+         */
+        let apiKey = ""; // <--- السطر رقم 305: ضع مفتاحك هنا
 
-        // UI Helpers
+        // --- Logic Engine ---
+
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -274,76 +256,51 @@
             });
         }
 
-        function toggleSettings() {
-            const modal = document.getElementById('settings-modal');
-            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('custom-api-key').value.trim();
-            if (key) {
-                localStorage.setItem('nexus_api_key', key);
-                checkConnection();
-                toggleSettings();
-                alert("تم حفظ المفتاح بنجاح!");
-            }
-        }
-
-        function getActiveKey() {
-            return localStorage.getItem('nexus_api_key') || apiKey;
-        }
-
         async function checkConnection() {
             const statusEl = document.getElementById('connection-status');
-            const key = getActiveKey();
             
-            if (!key) {
-                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> المفتاح غير متوفر (افتح الإعدادات)`;
-                statusEl.className = "inline-flex items-center gap-2 px-4 py-1 rounded-full bg-red-900/20 text-xs border border-red-500 text-red-400 mb-4";
+            if (!apiKey) {
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> غير متصل (يرجى تعديل سطر 305 في الكود)`;
+                statusEl.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-900/20 text-[10px] border border-red-500 text-red-400 mb-4 font-bold tracking-wider";
                 return false;
             }
-try {
-    // Quick test call
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ contents: [{ parts: [{ text: 'hi' }] }] })
-    });
-    
-    if (res.ok) {
-        statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500"></span> متصل وجاهز`;
-        statusEl.className = "inline-flex items-center gap-2 px-4 py-1 rounded-full bg-green-900/20 text-xs border border-green-500 text-green-400 mb-4";
-        return true;
-    } else {
-        throw new Error();
-    }
-} catch (e) {
-    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> خطأ في المفتاح أو الاتصال`;
-    statusEl.className = "inline-flex items-center gap-2 px-4 py-1 rounded-full bg-red-900/20 text-xs border border-red-500 text-red-400 mb-4";
-    return false;
-}
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: 'hi' }] }] })
+                });
+                
+                if (res.ok) {
+                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500"></span> النظام متصل ومؤمن`;
+                    statusEl.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-900/20 text-[10px] border border-green-500 text-green-400 mb-4 font-bold tracking-wider";
+                    return true;
+                } else { throw new Error(); }
+            } catch (e) {
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> خطأ: تأكد من صحة المفتاح في سطر 305`;
+                statusEl.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-900/20 text-[10px] border border-red-500 text-red-400 mb-4 font-bold tracking-wider";
+                return false;
+            }
         }
 
-        // Initialize connection check
         window.onload = checkConnection;
 
-        // API Core
-        async function fetchAI(url, body) {
-            const key = getActiveKey();
-            if (!key) throw new Error("يرجى إدخال مفتاح API من أيقونة الإعدادات بالأعلى.");
-
-            const response = await fetch(`${url}?key=${key}`, {
+    
+            }
+            const response = await fetch(`${url}?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error?.message || "خطأ في الاتصال بالخادم.");
+            if (!response.ok) throw new Error(data.error?.message || "فشل الاتصال بالذكاء الاصطناعي.");
             return data;
         }
+AIzaSyAUQcpvYN40MlbJdDNp0hH15_1JS2v78gE
+        // --- Core Application Functions ---
 
-        // Features Logic (Fixed & Simplified)
         async function generateText() {
             const input = document.getElementById('text-input').value;
             if (!input) return;
@@ -352,32 +309,38 @@ try {
                 const useSearch = document.getElementById('search-grounding').checked;
                 const payload = {
                     contents: [{ parts: [{ text: input }] }],
-                    systemInstruction: { parts: [{ text: "أنت ذكاء اصطناعي فائق، أجِب باللغة العربية بدقة." }] }
+                    systemInstruction: { parts: [{ text: "أنت ذكاء اصطناعي فائق يدعى Nexus، ساعد المستخدم بالعربية الفصحى." }] }
                 };
                 if (useSearch) payload.tools = [{ "google_search": {} }];
 
                 const data = await fetchAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`, payload);
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "لا توجد استجابة.";
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "لم أتمكن من استيعاب الطلب.";
                 
                 document.getElementById('text-result').textContent = text;
                 document.getElementById('text-result-container').classList.remove('hidden');
+                
+                const attributions = data.candidates?.[0]?.groundingMetadata?.groundingAttributions;
+                if (attributions) {
+                    document.getElementById('sources').innerHTML = "تم التحقق عبر: " + attributions.map(a => `<a href="${a.web?.uri}" target="_blank" class="mx-1 underline">${a.web?.title}</a>`).join(" | ");
+                }
             } catch (e) { alert(e.message); } finally { toggleLoading('text-btn', false); }
         }
 
         async function generateSoftware(lang) {
             const prompt = document.getElementById('code-prompt').value;
             if (!prompt) return;
-            toggleLoading(lang === 'html' ? 'html-btn' : 'py-btn', true);
+            const bId = lang === 'html' ? 'html-btn' : 'py-btn';
+            toggleLoading(bId, true);
             try {
                 const data = await fetchAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`, {
-                    contents: [{ parts: [{ text: `Generate RAW ${lang} code for: ${prompt}. No markdown, just code.` }] }]
+                    contents: [{ parts: [{ text: `Generate RAW ${lang} code for: ${prompt}. No markdown, just plain code.` }] }]
                 });
                 let code = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
                 code = code.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
                 
                 document.getElementById('code-output').textContent = code;
                 document.getElementById('code-result-container').classList.remove('hidden');
-            } catch (e) { alert(e.message); } finally { toggleLoading(lang === 'html' ? 'html-btn' : 'py-btn', false); }
+            } catch (e) { alert(e.message); } finally { toggleLoading(bId, false); }
         }
 
         let uploadedBase64 = null;
@@ -397,11 +360,11 @@ try {
             if (!uploadedBase64) return alert("ارفع صورة أولاً.");
             toggleLoading('vision-btn', true);
             try {
-                const prompt = document.getElementById('vision-prompt').value || "ماذا يوجد في الصورة؟";
+                const prompt = document.getElementById('vision-prompt').value || "اشرح محتويات الصورة.";
                 const data = await fetchAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`, {
                     contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: uploadedBase64 } }] }]
                 });
-                document.getElementById('vision-result-text').textContent = data.candidates[0].content.parts[0].text;
+                document.getElementById('vision-result-container').innerHTML = `<div class="p-4 text-slate-200">${data.candidates[0].content.parts[0].text}</div>`;
                 document.getElementById('vision-result-container').classList.remove('hidden');
             } catch (e) { alert(e.message); } finally { toggleLoading('vision-btn', false); }
         }
@@ -411,16 +374,16 @@ try {
             if (!prompt) return;
             toggleLoading('art-btn', true);
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${getActiveKey()}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ instances: [{ prompt: prompt }], parameters: { sampleCount: 1 } })
                 });
-                const data = await response.json();
+                const data = await res.json();
                 const b64 = data.predictions[0].bytesBase64Encoded;
                 document.getElementById('art-result').src = `data:image/png;base64,${b64}`;
                 document.getElementById('art-result-container').classList.remove('hidden');
-            } catch (e) { alert("حدث خطأ في توليد الصورة."); } finally { toggleLoading('art-btn', false); }
+            } catch (e) { alert("فشل توليد الصورة. قد يكون المحتوى غير متاح حالياً."); } finally { toggleLoading('art-btn', false); }
         }
 
         async function generateAudio() {
@@ -455,8 +418,13 @@ try {
 
         function copyText(id) {
             const text = document.getElementById(id).textContent;
-            navigator.clipboard.writeText(text);
-            alert("تم النسخ!");
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert("تم نسخ الكود!");
         }
 
         function pcmToWav(b64, rate) {
